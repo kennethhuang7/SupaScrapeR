@@ -92,6 +92,30 @@ SupaScrapeR provides an intelligent approach to Reddit data collection with mult
 
 ## Installation
 
+### 📊 **Standard vs Enhanced Performance**
+
+**📦 Standard Version:**
+- ✅ Faster startup time
+- ✅ Uses less memory (RAM)
+- ✅ Smaller download size
+- ✅ Works well on older computers
+- ⚡ Processes posts quickly
+
+**⚡ Enhanced Version:**
+- ⚠️ Slower first startup (loads language processing models)
+- ⚠️ Uses more memory (requires 4GB+ RAM recommended)
+- ⚠️ Larger download size
+- ✅ Much better at finding relevant posts (can detect names of people, organizations, GPEs (countries, cities, states, etc), and products)
+- ✅ Smarter filtering reduces irrelevant results
+- ✅ Better for research requiring higher accuracy
+
+**💡 Recommendation:** Most users should start with Standard and upgrade to Enhanced if they need more accurate results. If you have no worries about RAM or computer storage usage, Enhanced will always offer better results!
+
+**📝 Note:**  If you choose to download the Enhanced version, verify it's working correctly by checking the NLP status after logging in. On the "Choose how you want to run the scraper" screen (right after you log in successfully), look at the bottom of the screen below the three main buttons. You should see:
+- ✅ Enhanced version working: "✨ Enhanced Search with NLP is available" (in green text)
+- ⚠️ Problem detected: "⚠️ spaCy installed but model not found" (in yellow text)
+- ❌ Standard version only: "Standard search mode (spaCy not installed)" (in gray text)
+
 ### 🚀 **The Easy Way (Recommended for Everyone)**
 
 **No technical knowledge required!** Just download and double-click to run.
@@ -101,12 +125,12 @@ SupaScrapeR provides an intelligent approach to Reddit data collection with mult
 **Step 1: Download the App**
 1. Go to [our releases page](https://github.com/kennethhuang7/SupaScrapeR/releases)
 2. Look for the newest version at the top
-3. Click on `SupaScrapeR-Windows.zip` to download it
+3. Click on `SupaScrapeR-(whichever version you want)-Windows.zip` to download it
 4. Wait for the download to finish (the file will appear in your Downloads folder)
 
 **Step 2: Extract the App**
 1. Go to your Downloads folder
-2. Find the `SupaScrapeR-Windows.zip` file
+2. Find the `SupaScrapeR-(whichever version you want)-Windows.zip` file
 3. Right-click on it and choose "Extract All..."
 4. A window will pop up - just click "Extract"
 5. A new folder will appear with the app inside
@@ -140,12 +164,12 @@ SupaScrapeR provides an intelligent approach to Reddit data collection with mult
 **Step 1: Download the App**
 1. Go to [our releases page](https://github.com/yourusername/supascraper/releases)
 2. Look for the newest version at the top
-3. Click on `SupaScrapeR-macOS.zip` to download it
+3. Click on `SupaScrapeR-(whichever version you want)-macOS.zip` to download it
 4. Wait for the download to finish
 
 **Step 2: Install the App**
 1. Find the downloaded file (usually in Downloads)
-2. Double-click `SupaScrapeR-macOS.zip` to unzip it
+2. Double-click `SupaScrapeR-(whichever version you want)-macOS.zip` to unzip it
 3. Drag `SupaScrapeR.app` to your Applications folder
 
 **Step 3: First Time Running (Important!)**
