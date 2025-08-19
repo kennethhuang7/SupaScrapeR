@@ -1,10 +1,11 @@
 venv39/
 venv_mac/
 venv/
+venv_plus/
 env/
 __pycache__/
 *.pyc
-dist/
+dist/*/
 build/
 *.spec
 .DS_Store

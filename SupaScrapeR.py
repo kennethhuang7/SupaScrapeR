@@ -1,9 +1,13 @@
+#SupaScrapeR v1.1.0
+#Note: for building future updates using our .bat/bash files, the comment above should be updated to the correct version.
+#Keep thhe formatting the same! Include "SupaScrapeR " (including the space) in front of the version.
 import sys
 import time
 import traceback
 import os
 import json
 import platform
+import re
 from datetime import datetime, timezone
 from PyQt5.QtCore import Qt, pyqtSignal, QThread, QStandardPaths, QSize, QTimer
 from PyQt5.QtWidgets import (
@@ -17,6 +21,20 @@ from pytrends.request import TrendReq
 from supabase import create_client
 import html as html_lib
 from cryptography.fernet import Fernet
+NLP_AVAILABLE = False
+nlp = None
+inflect_engine = None
+try:
+    import spacy
+    import inflect
+    try:
+        nlp = spacy.load("en_core_web_sm")
+        inflect_engine = inflect.engine()
+        NLP_AVAILABLE = True
+    except:
+        NLP_AVAILABLE = False
+except ImportError:
+    NLP_AVAILABLE = False
 ERROR_LOG_FILE = "error_log.txt"
 USER_DATA_FILE = "user_presets.json"
 LAST_FOLDER_FILE = "last_folder.txt"
@@ -170,6 +188,120 @@ eye_open_path = resource_path("assets/eye_open.png")
 
 def get_sentiment(text):
     return analyzer.polarity_scores(text or "")["compound"]
+
+def is_post_relevant(title, body, keyword_phrase, use_spacy=True):
+    post_text = f"{title} {body}".lower()
+    
+    def find_entities_with_proximity(text, keyword_phrase):
+        if not NLP_AVAILABLE or not nlp:
+            return []
+        doc = nlp(keyword_phrase)
+        entities = []
+        for ent in doc.ents:
+            if ent.label_ in ["PERSON", "ORG", "GPE", "PRODUCT"]:
+                entity_text = ent.text.lower()
+                if ent.label_ == "PERSON" and len(entity_text.split()) > 1:
+                    words = entity_text.split()
+                    pattern = r'\b' + re.escape(words[0])
+                    pattern += r'(?:\s+\w+)?\s+' + re.escape(words[1])
+                    pattern += r'(?:\'?s)?\b'
+                    if re.search(pattern, text, re.IGNORECASE):
+                        entities.append(entity_text)
+                else:
+                    base_pattern = re.escape(entity_text)
+                    pattern = r'\b' + base_pattern + r'(?:\'?s|s|ed|ing|er|est)?\b'
+                    if re.search(pattern, text, re.IGNORECASE):
+                        entities.append(entity_text)
+        return entities
+    
+    def word_in_text_enhanced(word, text):
+        if ' ' in word:
+            return find_entities_with_proximity(text, word) or word.lower() in text.lower()
+        forms = {word.lower()}
+        if NLP_AVAILABLE and inflect_engine:
+            try:
+                plural_form = inflect_engine.plural(word)
+                singular_form = inflect_engine.singular_noun(word) or word
+                forms.add(plural_form.lower())
+                forms.add(singular_form.lower())
+                forms.add(f"{word.lower()}'s")
+                forms.add(f"{singular_form.lower()}'s")
+                forms.add(f"{word.lower()}s")
+                forms.add(f"{singular_form.lower()}s")
+            except:
+                pass
+        patterns = []
+        for form in forms:
+            base = re.escape(form)
+            patterns.append(r"\b" + base + r"(?:'?s|ed|ing|er|est)?\b")
+        combined = "|".join(patterns)
+        return bool(re.search(combined, text, re.IGNORECASE))
+    
+    def get_sentences(text):
+        sentences = re.split(r'[.!?]+', text)
+        return [s.strip() for s in sentences if s.strip()]
+    
+    def words_in_same_sentence(words, text):
+        sentences = get_sentences(text)
+        for sentence in sentences:
+            found_in_this_sentence = []
+            for word in words:
+                base = re.escape(word.lower())
+                pattern = r"\b" + base + r"(?:'?s|s|ed|ing|er|est)?\b"
+                if re.search(pattern, sentence, re.IGNORECASE):
+                    found_in_this_sentence.append(word)
+            if len(found_in_this_sentence) >= len(words):
+                return True
+            if len(words) >= 3 and len(found_in_this_sentence) >= len(words) - 1:
+                return True
+        return False
+
+    def word_in_text_basic(word, text):
+        if ' ' in word:
+            words = word.split()
+            return words_in_same_sentence(words, text)
+        base = re.escape(word.lower())
+        pattern = r"\b" + base + r"(?:'?s|s|ed|ing|er|est)?\b"
+        return bool(re.search(pattern, text, re.IGNORECASE))
+    
+    keyword_units = []
+    if use_spacy and NLP_AVAILABLE and nlp:
+        doc = nlp(keyword_phrase)
+        skip_indices = set()
+        for ent in doc.ents:
+            if ent.label_ in ["PERSON", "ORG", "GPE", "PRODUCT"]:
+                keyword_units.append(ent.text.lower())
+                for token in ent:
+                    skip_indices.add(token.i)
+        for i, token in enumerate(doc):
+            if i not in skip_indices and token.text.lower() not in ['the', 'a', 'an', 'of', 'in', 'on', 'at', 'to', 'for'] and len(token.text) > 2:
+                keyword_units.append(token.text.lower())
+    else:
+        words = keyword_phrase.lower().split()
+        keyword_units = words
+    if not keyword_units:
+        keyword_units = keyword_phrase.lower().split()
+    matched = []
+    for unit in keyword_units:
+        if use_spacy and NLP_AVAILABLE and nlp:
+            if word_in_text_enhanced(unit, post_text):
+                matched.append(unit)
+        else:
+            if word_in_text_basic(unit, post_text):
+                matched.append(unit)
+    if len(keyword_units) == 1:
+        if use_spacy and NLP_AVAILABLE and nlp:
+            is_relevant = word_in_text_enhanced(keyword_units[0], post_text)
+        else:
+            is_relevant = word_in_text_basic(keyword_units[0], post_text)
+    elif len(keyword_units) == 2:
+        if use_spacy and NLP_AVAILABLE and nlp:
+            is_relevant = all(word_in_text_enhanced(unit, post_text) for unit in keyword_units)
+        else:
+            is_relevant = all(word_in_text_basic(unit, post_text) for unit in keyword_units)
+    else:
+        is_relevant = len(matched) >= len(keyword_units) - 1
+    return is_relevant, matched
 
 def is_mod_or_bot_comment(comment):
     if hasattr(comment, 'body'):
@@ -825,7 +957,8 @@ class ScraperThread(QThread):
                                 f"<b>Cycle Mode:</b> {'Infinite' if self.run_infinite else 'Single'} | "
                                 f"<b>Scrape Method:</b> Keyword Search | "
                                 f"<b>Subreddit:</b> r/{safe_sub} | "
-                                f"<b>Keyword:</b> \"{safe_kw}\""
+                                f"<b>Keyword:</b> \"{safe_kw}\" | "
+                                f"<b>Batch Size:</b> {self.keyword_batch_size}"
                             )
                             max_retries = 3
                             retry_delay = 5
@@ -848,7 +981,20 @@ class ScraperThread(QThread):
                                             if not self._is_running:
                                                 break
                                             processed_posts += 1
-                                            result = self.scrape_submission(submission)
+                                            use_spacy = NLP_AVAILABLE and nlp
+                                            is_relevant, matched_words = is_post_relevant(submission.title or "", submission.selftext or "", keyword, use_spacy)
+                                            if not is_relevant:
+                                                safe_title = html_lib.escape(submission.title[:50] + "..." if len(submission.title) > 50 else submission.title)
+                                                total_words = len(keyword.split())
+                                                self.log_signal.emit(f"<b>Irrelevant Post (Skipped):</b> {safe_title}")
+                                                self.log_signal.emit(f"  → Matched only {len(matched_words)}/{total_words} words: {', '.join(matched_words) if matched_words else 'none'}")
+                                                self.log_signal.emit("")
+                                                completed_posts += 1
+                                                self.post_progress_signal.emit(completed_posts, total_posts if total_posts > 0 else 1)
+                                                continue                                            
+                                            result = self.scrape_submission(submission, keyword, matched_words)
+                                            #TEMPORARYTESTER
+                                            #time.sleep(10)
                                             completed_posts += 1
                                             self.post_progress_signal.emit(completed_posts, total_posts if total_posts > 0 else 1)                                          
                                             time.sleep(0.2)
@@ -893,7 +1039,8 @@ class ScraperThread(QThread):
                             f"<b>Cycle Mode:</b> {'Infinite' if self.run_infinite else 'Single'} | "
                             f"<b>Scrape Method:</b> DeepScan | "
                             f"<b>Subreddit:</b> r/{safe_sub} | "
-                            f"<b>Keyword:</b> (none)"
+                            f"<b>Keyword:</b> (none) | "
+                            f"<b>Batch Size:</b> {self.deepscan_batch_size}"
                         )
                         max_retries = 3
                         retry_delay = 5
@@ -929,7 +1076,7 @@ class ScraperThread(QThread):
                                             completed_posts += 1
                                             self.post_progress_signal.emit(completed_posts, total_posts)
                                             continue
-                                        result = self.scrape_submission(post)
+                                        result = self.scrape_submission(post, None, None)
                                         completed_posts += 1
                                         self.post_progress_signal.emit(completed_posts, total_posts)                                        
                                         time.sleep(0.2)
@@ -975,7 +1122,7 @@ class ScraperThread(QThread):
             self.cleanup_resources()
             self.finished_signal.emit()
 
-    def scrape_submission(self, submission):
+    def scrape_submission(self, submission, search_keyword=None, matched_words=None):
         try:
             if submission is None:
                 self.log_signal.emit(f"<b>Null Submission (Skipped):</b> Empty post data")
@@ -1055,6 +1202,9 @@ class ScraperThread(QThread):
                     response = self.supabase.table('reddit_posts').insert(insert_data).execute()
                     if not getattr(response, "error", None):
                         self.log_signal.emit(f"<b>Saved Post:</b> {info_title} — {info_date} — {info_link}")
+                        if search_keyword and matched_words:
+                            total_words = len(search_keyword.split())
+                            self.log_signal.emit(f"  → Matched {len(matched_words)}/{total_words} words: {', '.join(matched_words)}")
                         self.log_signal.emit("")
                         return "saved"
                     else:
@@ -2226,9 +2376,23 @@ class SupaScrapeR(QWidget):
         btn_once.setFixedHeight(button_height)
         btn_infinite.setFixedHeight(button_height)
         btn_logout.setFixedHeight(button_height)
+        nlp_status_label = QLabel()
+        nlp_status_label.setAlignment(Qt.AlignCenter)
+        nlp_status_label.setObjectName("Muted")
+        nlp_status_label.setStyleSheet("color: #6b7280; font-size: 11px;")
+        if NLP_AVAILABLE and nlp:
+            nlp_status_label.setText("✨ Enhanced Search with NLP is available")
+            nlp_status_label.setStyleSheet("color: #10b981; font-size: 11px;")
+        elif NLP_AVAILABLE and not nlp:
+            nlp_status_label.setText("⚠️ spaCy installed but model not found")
+            nlp_status_label.setStyleSheet("color: #f59e0b; font-size: 11px;")
+        else:
+            nlp_status_label.setText("Standard search mode (spaCy not installed)")
+            nlp_status_label.setStyleSheet("color: #6b7280; font-size: 11px;")
         content_layout.addWidget(btn_once, alignment=Qt.AlignHCenter)
         content_layout.addWidget(btn_infinite, alignment=Qt.AlignHCenter)
-        content_layout.addWidget(btn_logout, alignment=Qt.AlignHCenter)        
+        content_layout.addWidget(btn_logout, alignment=Qt.AlignHCenter) 
+        content_layout.addWidget(nlp_status_label, alignment=Qt.AlignHCenter)       
         layout.addLayout(content_layout)
         layout.addStretch(1)        
         outer_layout.addLayout(layout) 
