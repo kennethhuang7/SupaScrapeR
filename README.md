@@ -257,7 +257,7 @@ cd supascraper
 python -m venv venv_plus
 venv_plus\Scripts\activate
 pip install -r requirements.txt
-pip install spacy
+pip install spacy inflect
 python -m spacy download en_core_web_sm
 python SupaScrapeR.py
 ```
@@ -271,7 +271,7 @@ cd supascraper
 python3 -m venv venv_plus
 source venv_plus/bin/activate
 pip install -r requirements.txt
-pip install spacy
+pip install spacy inflect
 python -m spacy download en_core_web_sm
 python SupaScrapeR.py
 ```
@@ -282,9 +282,15 @@ python SupaScrapeR.py
 - `python -m venv venv` or `venv_plus` - Creates a safe environment for the app (enhanced uses separate environment)
 - `activate` - Activates that environment
 - `pip install -r requirements.txt` - Installs all the needed components
-- `pip install spacy` (Enhanced only) - Installs advanced language processing library
+- `pip install spacy inflect` (Enhanced only) - Installs advanced language processing library and text inflection tools
 - `python -m spacy download en_core_web_sm` (Enhanced only) - Downloads English language model for better text analysis
 - `python SupaScrapeR.py` - Runs the app
+
+**💡 Enhanced Version Notes:**
+- Requires approximately 50MB additional download for the language model
+- Uses more RAM during operation (4GB+ recommended)
+- Provides better keyword relevance detection and filtering
+- Can identify named entities (people, organizations, locations, products)
 
 **💡 Enhanced Version Notes:**
 - Requires approximately 50MB additional download for the language model
