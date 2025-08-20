@@ -162,7 +162,7 @@ SupaScrapeR provides an intelligent approach to Reddit data collection with mult
 #### For Mac Users
 
 **Step 1: Download the App**
-1. Go to [our releases page](https://github.com/yourusername/supascraper/releases)
+1. Go to [our releases page](https://github.com/kennethhuang7/SupaScrapeR/releases)
 2. Look for the newest version at the top
 3. Click on `SupaScrapeR-(whichever version you want)-macOS.zip` to download it
 4. Wait for the download to finish
@@ -226,7 +226,7 @@ If you're comfortable with programming and want to run the latest development ve
 1. Open Command Prompt (search "cmd" in Start menu)
 2. Copy and paste these commands one at a time, pressing Enter after each:
 ```cmd
-git clone https://github.com/yourusername/supascraper.git
+git clone https://github.com/kennethhuang7/supascraper.git
 cd supascraper
 python -m venv venv
 venv\Scripts\activate
@@ -238,7 +238,7 @@ python SupaScrapeR.py
 1. Open Terminal (Applications → Utilities → Terminal)
 2. Copy and paste these commands one at a time, pressing Enter after each:
 ```bash
-git clone https://github.com/yourusername/supascraper.git
+git clone https://github.com/kennethhuang7/supascraper.git
 cd supascraper
 python3 -m venv venv
 source venv/bin/activate
@@ -252,7 +252,7 @@ python SupaScrapeR.py
 1. Open Command Prompt (search "cmd" in Start menu)
 2. Copy and paste these commands one at a time, pressing Enter after each:
 ```cmd
-git clone https://github.com/yourusername/supascraper.git
+git clone https://github.com/kennethhuang7/supascraper.git
 cd supascraper
 python -m venv venv_plus
 venv_plus\Scripts\activate
@@ -266,7 +266,7 @@ python SupaScrapeR.py
 1. Open Terminal (Applications → Utilities → Terminal)
 2. Copy and paste these commands one at a time, pressing Enter after each:
 ```bash
-git clone https://github.com/yourusername/supascraper.git
+git clone https://github.com/kennethhuang7/supascraper.git
 cd supascraper
 python3 -m venv venv_plus
 source venv_plus/bin/activate
@@ -292,12 +292,6 @@ python SupaScrapeR.py
 - Provides better keyword relevance detection and filtering
 - Can identify named entities (people, organizations, locations, products)
 
-**💡 Enhanced Version Notes:**
-- Requires approximately 50MB additional download for the language model
-- Uses more RAM during operation (4GB+ recommended)
-- Provides better keyword relevance detection and filtering
-- Can identify named entities (people, organizations, locations, products)
-
 #### Technical Dependencies
 The app needs these Python components (automatically installed with the commands above):
 
@@ -311,7 +305,8 @@ The app needs these Python components (automatically installed with the commands
 
 **Enhanced Version (for better accuracy):**
 - All standard dependencies plus:
-- spacy>=3.7.0 - Advanced natural language processing
+- spacy - Advanced natural language processing
+- inflect - Handles plural/singular word forms for better keyword matching
 - en-core-web-sm - English language model for spaCy
 
 ## Database Setup
