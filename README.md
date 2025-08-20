@@ -208,19 +208,23 @@ xattr -dr com.apple.quarantine "/path/to/SupaScrapeR.app"
 5. Try opening the app normally
 
 ### 🔧 **The Technical Way (For Programmers)**
-
 If you're comfortable with programming and want to run the latest development version:
 
 #### Prerequisites
 - Python 3.7 or higher
 - Basic familiarity with command line/terminal
 
+#### Choose Your Version
+**Standard Version:** Faster startup, less memory usage, basic keyword matching
+**Enhanced Version:** Better accuracy with NLP features, requires more resources
+
 #### Installation Steps
+
+**Standard Version Setup:**
 
 **For Windows:**
 1. Open Command Prompt (search "cmd" in Start menu)
 2. Copy and paste these commands one at a time, pressing Enter after each:
-
 ```cmd
 git clone https://github.com/yourusername/supascraper.git
 cd supascraper
@@ -233,7 +237,6 @@ python SupaScrapeR.py
 **For Mac:**
 1. Open Terminal (Applications → Utilities → Terminal)
 2. Copy and paste these commands one at a time, pressing Enter after each:
-
 ```bash
 git clone https://github.com/yourusername/supascraper.git
 cd supascraper
@@ -243,22 +246,67 @@ pip install -r requirements.txt
 python SupaScrapeR.py
 ```
 
+**Enhanced Version Setup (for better accuracy):**
+
+**For Windows:**
+1. Open Command Prompt (search "cmd" in Start menu)
+2. Copy and paste these commands one at a time, pressing Enter after each:
+```cmd
+git clone https://github.com/yourusername/supascraper.git
+cd supascraper
+python -m venv venv_plus
+venv_plus\Scripts\activate
+pip install -r requirements.txt
+pip install spacy
+python -m spacy download en_core_web_sm
+python SupaScrapeR.py
+```
+
+**For Mac:**
+1. Open Terminal (Applications → Utilities → Terminal)
+2. Copy and paste these commands one at a time, pressing Enter after each:
+```bash
+git clone https://github.com/yourusername/supascraper.git
+cd supascraper
+python3 -m venv venv_plus
+source venv_plus/bin/activate
+pip install -r requirements.txt
+pip install spacy
+python -m spacy download en_core_web_sm
+python SupaScrapeR.py
+```
+
 #### What These Commands Do
 - `git clone` - Downloads the source code
 - `cd supascraper` - Enters the downloaded folder
-- `python -m venv venv` - Creates a safe environment for the app
+- `python -m venv venv` or `venv_plus` - Creates a safe environment for the app (enhanced uses separate environment)
 - `activate` - Activates that environment
 - `pip install -r requirements.txt` - Installs all the needed components
+- `pip install spacy` (Enhanced only) - Installs advanced language processing library
+- `python -m spacy download en_core_web_sm` (Enhanced only) - Downloads English language model for better text analysis
 - `python SupaScrapeR.py` - Runs the app
+
+**💡 Enhanced Version Notes:**
+- Requires approximately 50MB additional download for the language model
+- Uses more RAM during operation (4GB+ recommended)
+- Provides better keyword relevance detection and filtering
+- Can identify named entities (people, organizations, locations, products)
 
 #### Technical Dependencies
 The app needs these Python components (automatically installed with the commands above):
-- `PyQt5>=5.15.0` - Creates the user interface
-- `praw>=7.0.0` - Connects to Reddit
-- `vaderSentiment>=3.3.2` - Analyzes emotion in text
-- `pytrends>=4.9.0` - Gets trending topics from Google
-- `supabase>=1.0.0` - Connects to the database
-- `cryptography>=3.4.0` - Keeps your passwords safe
+
+**Standard Version:**
+- PyQt5>=5.15.0 - Creates the user interface
+- praw>=7.0.0 - Connects to Reddit
+- vaderSentiment>=3.3.2 - Analyzes emotion in text
+- pytrends>=4.9.0 - Gets trending topics from Google
+- supabase>=1.0.0 - Connects to the database
+- cryptography>=3.4.0 - Keeps your passwords safe
+
+**Enhanced Version (for better accuracy):**
+- All standard dependencies plus:
+- spacy>=3.7.0 - Advanced natural language processing
+- en-core-web-sm - English language model for spaCy
 
 ## Database Setup
 
