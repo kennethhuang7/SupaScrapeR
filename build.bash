@@ -54,18 +54,18 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-echo "Building executable..."
+echo "Building app bundle..."
 if [ -d "assets" ]; then
     echo "Assets folder found, including in build..."
     if [ -f "assets/supascraper-icon.icns" ]; then
-        pyinstaller --onefile --windowed --name="SupaScrapeR" --add-data="$(pwd)/assets:assets" --icon="$(pwd)/assets/supascraper-icon.icns" --distpath="$STANDARD_DIR" --workpath="build/standard" --specpath="build/standard" SupaScrapeR.py
+        pyinstaller --onedir --windowed --name="SupaScrapeR" --add-data="$(pwd)/assets:assets" --icon="$(pwd)/assets/supascraper-icon.icns" --distpath="$STANDARD_DIR" --workpath="build/standard" --specpath="build/standard" SupaScrapeR.py
     else
         echo "No .icns file found, building without icon..."
-        pyinstaller --onefile --windowed --name="SupaScrapeR" --add-data="$(pwd)/assets:assets" --distpath="$STANDARD_DIR" --workpath="build/standard" --specpath="build/standard" SupaScrapeR.py
+        pyinstaller --onedir --windowed --name="SupaScrapeR" --add-data="$(pwd)/assets:assets" --distpath="$STANDARD_DIR" --workpath="build/standard" --specpath="build/standard" SupaScrapeR.py
     fi
 else
     echo "No assets folder found, building without assets..."
-    pyinstaller --onefile --windowed --name="SupaScrapeR" --distpath="$STANDARD_DIR" --workpath="build/standard" --specpath="build/standard" SupaScrapeR.py
+    pyinstaller --onedir --windowed --name="SupaScrapeR" --distpath="$STANDARD_DIR" --workpath="build/standard" --specpath="build/standard" SupaScrapeR.py
 fi
 
 if [ $? -ne 0 ]; then
@@ -108,18 +108,18 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-echo "Building executable..."
+echo "Building app bundle..."
 if [ -d "assets" ]; then
     echo "Assets folder found, including in build..."
     if [ -f "assets/supascraper-icon.icns" ]; then
-        pyinstaller --onefile --windowed --name="SupaScrapeR" --add-data="$(pwd)/assets:assets" --icon="$(pwd)/assets/supascraper-icon.icns" --hidden-import=inflect --collect-all=inflect --hidden-import=spacy --collect-all=spacy --hidden-import=en_core_web_sm --collect-all=en_core_web_sm --hidden-import=spacy.lang.en --copy-metadata=spacy --copy-metadata=en_core_web_sm --noupx --distpath="$ENHANCED_DIR" --workpath="build/enhanced" --specpath="build/enhanced" SupaScrapeR.py
+        pyinstaller --onedir --windowed --name="SupaScrapeR" --add-data="$(pwd)/assets:assets" --icon="$(pwd)/assets/supascraper-icon.icns" --hidden-import=inflect --collect-all=inflect --hidden-import=spacy --collect-all=spacy --hidden-import=en_core_web_sm --collect-all=en_core_web_sm --collect-data=en_core_web_sm --hidden-import=spacy.lang.en --hidden-import=spacy.lang.en.stop_words --copy-metadata=spacy --copy-metadata=en_core_web_sm --copy-metadata=spacy-legacy --copy-metadata=spacy-loggers --noupx --distpath="$ENHANCED_DIR" --workpath="build/enhanced" --specpath="build/enhanced" SupaScrapeR.py
     else
         echo "No .icns file found, building without icon..."
-        pyinstaller --onefile --windowed --name="SupaScrapeR" --add-data="$(pwd)/assets:assets" --hidden-import=inflect --collect-all=inflect --hidden-import=spacy --collect-all=spacy --hidden-import=en_core_web_sm --collect-all=en_core_web_sm --hidden-import=spacy.lang.en --copy-metadata=spacy --copy-metadata=en_core_web_sm --noupx --distpath="$ENHANCED_DIR" --workpath="build/enhanced" --specpath="build/enhanced" SupaScrapeR.py
+        pyinstaller --onedir --windowed --name="SupaScrapeR" --add-data="$(pwd)/assets:assets" --hidden-import=inflect --collect-all=inflect --hidden-import=spacy --collect-all=spacy --hidden-import=en_core_web_sm --collect-all=en_core_web_sm --collect-data=en_core_web_sm --hidden-import=spacy.lang.en --hidden-import=spacy.lang.en.stop_words --copy-metadata=spacy --copy-metadata=en_core_web_sm --copy-metadata=spacy-legacy --copy-metadata=spacy-loggers --noupx --distpath="$ENHANCED_DIR" --workpath="build/enhanced" --specpath="build/enhanced" SupaScrapeR.py
     fi
 else
     echo "No assets folder found, building without assets..."
-    pyinstaller --onefile --windowed --name="SupaScrapeR" --hidden-import=inflect --collect-all=inflect --hidden-import=spacy --collect-all=spacy --hidden-import=en_core_web_sm --collect-all=en_core_web_sm --hidden-import=spacy.lang.en --copy-metadata=spacy --copy-metadata=en_core_web_sm --noupx --distpath="$ENHANCED_DIR" --workpath="build/enhanced" --specpath="build/enhanced" SupaScrapeR.py
+    pyinstaller --onedir --windowed --name="SupaScrapeR" --hidden-import=inflect --collect-all=inflect --hidden-import=spacy --collect-all=spacy --hidden-import=en_core_web_sm --collect-all=en_core_web_sm --collect-data=en_core_web_sm --hidden-import=spacy.lang.en --hidden-import=spacy.lang.en.stop_words --copy-metadata=spacy --copy-metadata=en_core_web_sm --copy-metadata=spacy-legacy --copy-metadata=spacy-loggers --noupx --distpath="$ENHANCED_DIR" --workpath="build/enhanced" --specpath="build/enhanced" SupaScrapeR.py
 fi
 
 if [ $? -ne 0 ]; then
@@ -167,7 +167,7 @@ echo "========================================"
 
 echo "Creating standard ZIP package..."
 cd "$STANDARD_DIR"
-zip -r "SupaScrapeR-standard-macos.zip" "SupaScrapeR" "README.txt"
+zip -r "SupaScrapeR-standard-macos.zip" "SupaScrapeR.app" "README.txt"
 if [ $? -ne 0 ]; then
     echo "WARNING: Failed to create standard ZIP package"
 else
@@ -177,7 +177,7 @@ cd - > /dev/null
 
 echo "Creating enhanced ZIP package..."
 cd "$ENHANCED_DIR"
-zip -r "SupaScrapeR-enhanced-macos.zip" "SupaScrapeR" "README.txt"
+zip -r "SupaScrapeR-enhanced-macos.zip" "SupaScrapeR.app" "README.txt"
 if [ $? -ne 0 ]; then
     echo "WARNING: Failed to create enhanced ZIP package"
 else
@@ -190,8 +190,8 @@ echo "========================================"
 echo "           Build Complete!"
 echo "========================================"
 echo
-echo "Standard version: $STANDARD_DIR/SupaScrapeR"
-echo "Enhanced version: $ENHANCED_DIR/SupaScrapeR"
+echo "Standard version: $STANDARD_DIR/SupaScrapeR.app"
+echo "Enhanced version: $ENHANCED_DIR/SupaScrapeR.app"
 echo
 echo "ZIP packages:"
 echo "- $STANDARD_DIR/SupaScrapeR-standard-macos.zip"

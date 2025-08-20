@@ -21,20 +21,31 @@ from pytrends.request import TrendReq
 from supabase import create_client
 import html as html_lib
 from cryptography.fernet import Fernet
+
 NLP_AVAILABLE = False
 nlp = None
 inflect_engine = None
-try:
-    import spacy
-    import inflect
+
+def initialize_nlp():
+    global NLP_AVAILABLE, nlp, inflect_engine
+    if NLP_AVAILABLE:  
+        return
     try:
-        nlp = spacy.load("en_core_web_sm")
-        inflect_engine = inflect.engine()
-        NLP_AVAILABLE = True
-    except:
+        import spacy
+        import inflect
+        try:
+            nlp = spacy.load("en_core_web_sm")
+            inflect_engine = inflect.engine()
+            NLP_AVAILABLE = True
+        except Exception as e:
+            NLP_AVAILABLE = False
+    except ImportError as e:
         NLP_AVAILABLE = False
-except ImportError:
-    NLP_AVAILABLE = False
+try:
+    initialize_nlp()
+except Exception as e:
+    pass
+
 ERROR_LOG_FILE = "error_log.txt"
 USER_DATA_FILE = "user_presets.json"
 LAST_FOLDER_FILE = "last_folder.txt"
@@ -190,6 +201,8 @@ def get_sentiment(text):
     return analyzer.polarity_scores(text or "")["compound"]
 
 def is_post_relevant(title, body, keyword_phrase, use_spacy=True):
+    if not NLP_AVAILABLE:
+        initialize_nlp()
     post_text = f"{title} {body}".lower()
     
     def find_entities_with_proximity(text, keyword_phrase):
