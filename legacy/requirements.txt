@@ -1,0 +1,7 @@
+PyQt5>=5.15.0
+praw>=7.0.0
+vaderSentiment>=3.3.2
+pytrends>=4.9.0
+supabase>=1.0.0
+cryptography>=3.4.0
+pyinstaller>=5.0.0

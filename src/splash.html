@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      margin: 0;
+      background: #1a1f2e;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      overflow: hidden;
+      opacity: 0;
+      animation: fadeInBody 0.2s ease-in forwards;
+    }
+    @keyframes fadeInBody {
+      to {
+        opacity: 1;
+      }
+    }
+    .splash-content {
+      text-align: center;
+      position: relative;
+    }
+    .logo-with-text {
+      width: 280px;
+      height: auto;
+      margin: 0 auto;
+      display: block;
+    }
+    .loading-text {
+      color: #e5e7eb;
+      margin-top: 24px;
+      font-size: 14px;
+      font-style: italic;
+      letter-spacing: 3px;
+      opacity: 0;
+      animation: fadeIn 0.5s ease-in forwards;
+      animation-delay: 0.3s;
+    }
+    .progress-bar {
+      width: 200px;
+      height: 2px;
+      background: rgba(79, 140, 255, 0.2);
+      border-radius: 2px;
+      margin: 20px auto 0;
+      overflow: hidden;
+      opacity: 0;
+      animation: fadeIn 0.5s ease-in forwards;
+      animation-delay: 0.5s;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, transparent, #4f8cff, transparent);
+      width: 40%;
+      animation: shimmer 1.5s ease-in-out infinite;
+    }
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+    @keyframes shimmer {
+      0% {
+        transform: translateX(-100%);
+      }
+      100% {
+        transform: translateX(350%);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="splash-content">
+    <img src="../assets/supascraper-complete-logo.png" class="logo-with-text">
+    <div class="loading-text">STARTING</div>
+    <div class="progress-bar">
+      <div class="progress-fill"></div>
+    </div>
+  </div>
+</body>
+</html>
