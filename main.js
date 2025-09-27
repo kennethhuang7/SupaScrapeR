@@ -21,7 +21,8 @@ function createSplashWindow() {
     },
     center: true,
     resizable: false,
-    show: false
+    show: false,
+    icon: path.join(__dirname, 'assets/supascraper-icon.png')
   });
   splashWindow.loadFile('src/splash.html');
   splashWindow.once('ready-to-show', () => {

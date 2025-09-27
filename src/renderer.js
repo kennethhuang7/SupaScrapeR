@@ -21,25 +21,32 @@ window.minimizeWindow = () => ipcRenderer.send('minimize-window');
 window.maximizeWindow = () => ipcRenderer.send('maximize-window');
 window.closeWindow = () => ipcRenderer.send('close-window');
 document.addEventListener('DOMContentLoaded', () => {
-  const autoLogin = checkExistingFolder();
-  if (!autoLogin) {
-    loadScreen('folder-select');
+  const existingFolderLoaded = checkExistingFolder();
+  if (!existingFolderLoaded) {
+    setActiveSidebarItem(document.querySelector('.sidebar-item[data-screen="home"]'));
+    loadHomeScreen();
   }
-  setupSidebarNavigation();
 });
-
 function setupSidebarNavigation() {
-  const sidebarItems = document.querySelectorAll('.sidebar-item[data-screen]');
+  const sidebarItems = document.querySelectorAll('.sidebar-item');
   sidebarItems.forEach(item => {
     item.addEventListener('click', () => {
-      const screen = item.dataset.screen;
-      if (screen && canNavigateToScreen(screen)) {
+      const screen = item.getAttribute('data-screen');
+      if (screen) {
         setActiveSidebarItem(item);
         loadScreen(screen);
       }
     });
   });
 }
+document.addEventListener('DOMContentLoaded', () => {
+  setupSidebarNavigation();
+  const existingFolderLoaded = checkExistingFolder();
+  if (!existingFolderLoaded) {
+    setActiveSidebarItem(document.querySelector('.sidebar-item[data-screen="home"]'));
+    loadHomeScreen();
+  }
+});
 function setActiveSidebarItem(activeItem) {
   document.querySelectorAll('.sidebar-item').forEach(item => {
     item.classList.remove('active');
@@ -52,11 +59,11 @@ function canNavigateToScreen(screen) {
   if (screen === 'scraper' && appData.credentials.redditClientId) return true;
   return false;
 }
-function loadScreen(screenName) {
-  currentScreen = screenName;
-  const container = document.getElementById('screen-container');
-  container.innerHTML = '';
-  switch(screenName) {
+function loadScreen(screen) {
+  switch(screen) {
+    case 'home':
+      loadHomeScreen();
+      break;
     case 'folder-select':
       loadFolderSelectScreen();
       break;
@@ -66,14 +73,29 @@ function loadScreen(screenName) {
     case 'run-mode':
       loadRunModeScreen();
       break;
+    case 'statistics':
+      loadStatisticsScreen();
+      break;
+    case 'performance':
+      loadPerformanceScreen();
+      break;
+    case 'presets':
+      loadPresetsScreen();
+      break;
+    case 'settings':
+      loadSettingsScreen();  
+      break;
+    case 'scraper':
+      loadRunModeScreen();  
+      break;
     case 'scrape-mode':
       loadScrapeModeScreen();
       break;
+    case 'settings-config':
+      loadSettingsConfigScreen();  
+      break;
     case 'preset-select':
       loadPresetSelectScreen();
-      break;
-    case 'custom-keywords':
-      loadCustomKeywordsScreen();
       break;
     case 'keyword-select':
       loadKeywordSelectScreen();
@@ -84,12 +106,14 @@ function loadScreen(screenName) {
     case 'confirmation':
       loadConfirmationScreen();
       break;
-    case 'settings':
-      loadSettingsScreen();
+    case 'custom-keywords':
+      loadCustomKeywordsScreen();
       break;
-    case 'scraper-status':
-      loadScraperStatusScreen();
+    case 'scraping-status':
+      loadScrapingStatusScreen();
       break;
+    default:
+      loadHomeScreen();
   }
 }
 function loadFolderSelectScreen() {
@@ -127,6 +151,78 @@ function loadFolderSelectScreen() {
     </div>
   `;
   checkExistingFolder();
+}
+function loadHomeScreen() {
+  const container = document.getElementById('screen-container');
+  container.innerHTML = `
+    <div class="home-screen">
+      <div class="home-header">
+        <div class="welcome-section">
+          <h1 class="welcome-title">Welcome to SupaScrapeR</h1>
+          <p class="welcome-subtitle">Advanced Reddit Data Collection Tool v2.0</p>
+        </div>
+        <div class="status-section">
+          <div class="status-indicator ${appData.credentials ? 'connected' : 'disconnected'}">
+            <span class="status-dot"></span>
+            <span class="status-text">${appData.credentials ? 'Connected' : 'Not Connected'}</span>
+          </div>
+          ${appData.lastRunTime ? `<div class="last-run">Last run: ${formatTimeAgo(appData.lastRunTime)}</div>` : ''}
+        </div>
+      </div>
+      <div class="home-cards">
+        <div class="home-card" onclick="navigateToScraper()">
+          <div class="card-icon">🚀</div>
+          <h3 class="card-title">Start Scraping</h3>
+          <p class="card-description">Begin collecting Reddit data with your configured settings</p>
+          <div class="card-action">Start →</div>
+        </div>
+        <div class="home-card" onclick="loadScreen('statistics')">
+          <div class="card-icon">📊</div>
+          <h3 class="card-title">Statistics</h3>
+          <p class="card-description">View your collection history and success rates</p>
+          <div class="card-action">View →</div>
+        </div>
+        <div class="home-card" onclick="loadScreen('performance')">
+          <div class="card-icon">📈</div>
+          <h3 class="card-title">Performance</h3>
+          <p class="card-description">Monitor system resources and scraping efficiency</p>
+          <div class="card-action">Monitor →</div>
+        </div>
+        <div class="home-card" onclick="loadScreen('presets')">
+          <div class="card-icon">📁</div>
+          <h3 class="card-title">Manage Presets</h3>
+          <p class="card-description">Configure and organize your scraping presets</p>
+          <div class="card-action">Manage →</div>
+        </div>
+      </div>
+      ${appData.isScrapingActive ? `
+        <div class="progress-bar-container">
+          <div class="progress-label">Scraping in progress...</div>
+          <div class="unified-progress-bar">
+            <div class="progress-fill-unified" style="width: ${appData.scrapingProgress || 0}%"></div>
+            <span class="progress-text-unified">${appData.scrapingProgress || 0}%</span>
+          </div>
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+function navigateToScraper() {
+  if (!appData.credentials) {
+    loadScreen('folder-select');
+  } else {
+    loadScreen('run-mode');
+  }
+}
+function formatTimeAgo(timestamp) {
+  const seconds = Math.floor((Date.now() - timestamp) / 1000);
+  if (seconds < 60) return 'just now';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+  const days = Math.floor(hours / 24);
+  return `${days} day${days > 1 ? 's' : ''} ago`;
 }
 function getDefaultFolder() {
   const home = process.env.HOME || process.env.USERPROFILE;
@@ -217,8 +313,8 @@ function handleBackendMessage(message) {
         loginBtn.disabled = false;
         loginBtn.textContent = '🔑 Login';
       }
-      setActiveSidebarItem(document.querySelector('.sidebar-item[data-screen="scraper"]'));
-      loadScreen('run-mode');
+      setActiveSidebarItem(document.querySelector('.sidebar-item[data-screen="home"]'));
+      loadScreen('home');
       sendToBackend({ type: 'check-nlp' });
       break;
     case 'login-error':
@@ -548,6 +644,562 @@ window.handleLogout = () => {
   };
   setActiveSidebarItem(document.querySelector('.sidebar-item[data-screen="folder-select"]'));
   loadScreen('folder-select');
+};
+function loadSettingsScreen() {
+  const container = document.getElementById('screen-container');
+  const version = appData.nlpAvailable ? '2.0.0e' : '2.0.0s';
+  const home = process.env.HOME || process.env.USERPROFILE;
+  const installPath = process.cwd();
+  const dataPath = appData.dataFolder || path.join(home, 'Documents', 'SupaScrapeR');
+  container.innerHTML = `
+    <div class="settings-page">
+      <div class="settings-header">
+        <h1 class="settings-title">Settings</h1>
+        <p class="settings-subtitle">Configure your SupaScrapeR preferences</p>
+      </div>
+      <div class="settings-sections">
+        <div class="settings-card">
+          <h2 class="settings-section-title">Application Information</h2>
+          <div class="settings-item">
+            <div class="settings-item-label">
+              Version
+              <span class="tooltip-icon" title="Enhanced version includes NLP capabilities">ⓘ</span>
+            </div>
+            <div class="settings-item-value">
+              <span class="version-badge ${appData.nlpAvailable ? 'enhanced' : 'standard'}">${version}</span>
+            </div>
+          </div>
+          <div class="settings-item">
+            <div class="settings-item-label">Installation Path</div>
+            <div class="settings-item-value">
+              <code class="path-display">${installPath}</code>
+            </div>
+          </div>
+          <div class="settings-item">
+            <div class="settings-item-label">Data Folder Path</div>
+            <div class="settings-item-value">
+              <code class="path-display">${dataPath}</code>
+            </div>
+          </div>
+        </div>
+        <div class="settings-card">
+          <h2 class="settings-section-title">Updates</h2>
+          <div class="settings-item">
+            <div class="settings-item-label">Current Version</div>
+            <div class="settings-item-value">${version}</div>
+          </div>
+          <div class="settings-item">
+            <div class="settings-item-label">Latest Version</div>
+            <div class="settings-item-value" id="latest-version">
+              <span class="loading-text">Checking...</span>
+            </div>
+          </div>
+          <div class="settings-actions">
+            <button class="btn-secondary" onclick="checkForUpdates()">
+              <span>🔄</span> Check for Updates
+            </button>
+            <div id="update-message" class="update-message" style="display: none;"></div>
+          </div>
+        </div>
+        <div class="settings-card">
+          <h2 class="settings-section-title">Preferences</h2>
+          <div class="settings-item">
+            <label class="settings-checkbox">
+              <input type="checkbox" id="auto-start" onchange="saveAppSettings()">
+              <span>Auto-start on system boot</span>
+            </label>
+          </div>
+          <div class="settings-item">
+            <label class="settings-checkbox">
+              <input type="checkbox" id="minimize-to-tray" checked onchange="saveAppSettings()">
+              <span>Minimize to tray on close</span>
+            </label>
+          </div>
+          <div class="settings-item">
+            <label class="settings-checkbox">
+              <input type="checkbox" id="enable-notifications" checked onchange="saveAppSettings()">
+              <span>Enable notifications</span>
+            </label>
+          </div>
+          <div class="settings-item">
+            <div class="settings-item-label">Theme</div>
+            <div class="settings-item-value">
+              <select class="settings-select" id="theme-select" onchange="changeTheme(this.value)">
+                <option value="dark">Dark</option>
+                <option value="light">Light</option>
+                <option value="auto">Auto</option>
+              </select>
+            </div>
+          </div>
+          <div class="settings-item">
+            <div class="settings-item-label">
+              Font Size
+              <span class="font-preview">Aa</span>
+            </div>
+            <div class="settings-item-value">
+              <div class="slider-container">
+                <span class="slider-min">10px</span>
+                <input type="range" class="settings-slider" id="font-size" min="10" max="20" value="14" oninput="updateFontSize(this.value)">
+                <span class="slider-max">20px</span>
+                <span class="slider-current" id="font-size-value">14px</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="settings-card">
+          <h2 class="settings-section-title">Maintenance</h2>
+          <div class="settings-actions">
+            <button class="btn-warning" onclick="resetToDefaults()">
+              <span>⚠️</span> Reset to Defaults
+            </button>
+            <button class="btn-secondary" onclick="openErrorLog()">
+              <span>🐛</span> Bug Report
+              <span class="tooltip-icon" title="Opens error_log.txt for reporting issues on GitHub">?</span>
+            </button>
+            <div class="danger-zone">
+              <button class="btn-danger" onclick="showUninstallDialog()">
+                <span>🗑️</span> Uninstall SupaScrapeR
+              </button>
+              <label class="settings-checkbox danger-checkbox">
+                <input type="checkbox" id="delete-all-data">
+                <span>Delete all user data and settings</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  checkForUpdates(true);
+  loadAppSettings();
+}
+function saveAppSettings() {
+  const settings = {
+    autoStart: document.getElementById('auto-start').checked,
+    minimizeToTray: document.getElementById('minimize-to-tray').checked,
+    enableNotifications: document.getElementById('enable-notifications').checked,
+    theme: document.getElementById('theme-select').value,
+    fontSize: document.getElementById('font-size').value
+  };
+  localStorage.setItem('supascraper-app-settings', JSON.stringify(settings));
+  ipcRenderer.send('update-settings', settings);
+}
+function loadAppSettings() {
+  const saved = localStorage.getItem('supascraper-app-settings');
+  if (saved) {
+    const settings = JSON.parse(saved);
+    document.getElementById('auto-start').checked = settings.autoStart || false;
+    document.getElementById('minimize-to-tray').checked = settings.minimizeToTray !== false;
+    document.getElementById('enable-notifications').checked = settings.enableNotifications !== false;
+    document.getElementById('theme-select').value = settings.theme || 'dark';
+    document.getElementById('font-size').value = settings.fontSize || 14;
+    updateFontSize(settings.fontSize || 14);
+  }
+}
+function loadSettingsScreen() {
+  const container = document.getElementById('screen-container');
+  container.style.display = 'none';
+  const sidebar = document.querySelector('.sidebar');
+  sidebar.style.display = 'none';
+  const appBody = document.querySelector('.app-body');
+  appBody.innerHTML = `
+    <div class="settings-container">
+      <div class="settings-sidebar">
+        <div class="settings-nav">
+          <div class="settings-nav-header">USER SETTINGS</div>
+          <button class="settings-nav-item active" onclick="switchSettingsTab('account')">
+            <span>My Account</span>
+          </button>
+          <button class="settings-nav-item" onclick="switchSettingsTab('preferences')">
+            <span>Preferences</span>
+          </button>
+          <button class="settings-nav-item" onclick="switchSettingsTab('appearance')">
+            <span>Appearance</span>
+          </button>
+          <div class="settings-nav-header">APP SETTINGS</div>
+          <button class="settings-nav-item" onclick="switchSettingsTab('scraping')">
+            <span>Scraping</span>
+          </button>
+          <button class="settings-nav-item" onclick="switchSettingsTab('updates')">
+            <span>Updates</span>
+          </button>
+          <button class="settings-nav-item" onclick="switchSettingsTab('advanced')">
+            <span>Advanced</span>
+          </button>
+          <div class="settings-nav-divider"></div>
+          <button class="settings-nav-item danger" onclick="handleLogout()">
+            <span>Log Out</span>
+          </button>
+        </div>
+      </div>
+      <div class="settings-content">
+        <div class="settings-close-button" onclick="closeSettings()">
+          <svg width="18" height="18" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M18.4 4L12 10.4L5.6 4L4 5.6L10.4 12L4 18.4L5.6 20L12 13.6L18.4 20L20 18.4L13.6 12L20 5.6L18.4 4Z"/>
+          </svg>
+        </div>
+        <div class="settings-page active" id="settings-account">
+          ${getAccountSettingsHTML()}
+        </div>
+        <div class="settings-page" id="settings-preferences">
+          ${getPreferencesHTML()}
+        </div>
+        <div class="settings-page" id="settings-appearance">
+          ${getAppearanceHTML()}
+        </div>
+        <div class="settings-page" id="settings-scraping">
+          ${getScrapingSettingsHTML()}
+        </div>
+        <div class="settings-page" id="settings-updates">
+          ${getUpdatesHTML()}
+        </div>
+        <div class="settings-page" id="settings-advanced">
+          ${getAdvancedSettingsHTML()}
+        </div>
+      </div>
+    </div>
+  `;
+  loadAppSettings();
+  checkForUpdates(true);
+}
+window.closeSettings = () => {
+  document.querySelector('.sidebar').style.display = '';
+  document.getElementById('screen-container').style.display = '';
+  document.getElementById('screen-container').style.maxWidth = '';
+  loadScreen('home');
+};
+window.switchSettingsTab = (tab) => {
+  document.querySelectorAll('.settings-nav-item').forEach(item => {
+    item.classList.remove('active');
+  });
+  document.querySelectorAll('.settings-page').forEach(page => {
+    page.classList.remove('active');
+  });
+  const clickedItem = Array.from(document.querySelectorAll('.settings-nav-item'))
+    .find(item => item.onclick && item.onclick.toString().includes(tab));
+  if (clickedItem) clickedItem.classList.add('active');
+  document.getElementById(`settings-${tab}`).classList.add('active');
+};
+function getAccountSettingsHTML() {
+  const version = appData.nlpAvailable ? '2.0.0e' : '2.0.0s';
+  const home = process.env.HOME || process.env.USERPROFILE;
+  const dataPath = appData.dataFolder || path.join(home, 'Documents', 'SupaScrapeR');
+  return `
+    <div class="settings-page-header">
+      <h2>My Account</h2>
+    </div>
+    <div class="settings-section">
+      <h3>Account Information</h3>
+      <div class="settings-field">
+        <label>Version</label>
+        <div class="field-value">
+          <span class="version-badge ${appData.nlpAvailable ? 'enhanced' : 'standard'}">
+            ${version} ${appData.nlpAvailable ? 'Enhanced' : 'Standard'}
+          </span>
+        </div>
+      </div>
+      <div class="settings-field">
+        <label>Installation Path</label>
+        <div class="field-value">
+          <code class="path-display">${process.cwd()}</code>
+        </div>
+      </div>
+      <div class="settings-field">
+        <label>Data Folder</label>
+        <div class="field-value">
+          <code class="path-display">${dataPath}</code>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function getPreferencesHTML() {
+  return `
+    <div class="settings-page-header">
+      <h2>Preferences</h2>
+    </div>
+    <div class="settings-section">
+      <h3>Startup</h3>
+      <div class="settings-switch">
+        <label>
+          <span>Auto-start on system boot</span>
+          <span class="switch-description">Launch SupaScrapeR when your computer starts</span>
+        </label>
+        <input type="checkbox" id="auto-start" class="switch-input" onchange="saveAppSettings()">
+        <span class="switch-toggle"></span>
+      </div>
+    </div>
+    <div class="settings-section">
+      <h3>System Tray</h3>
+      <div class="settings-switch">
+        <label>
+          <span>Minimize to tray on close</span>
+          <span class="switch-description">Keep running in background when window is closed</span>
+        </label>
+        <input type="checkbox" id="minimize-to-tray" class="switch-input" checked onchange="saveAppSettings()">
+        <span class="switch-toggle"></span>
+      </div>
+    </div>
+    <div class="settings-section">
+      <h3>Notifications</h3>
+      <div class="settings-switch">
+        <label>
+          <span>Enable desktop notifications</span>
+          <span class="switch-description">Get notified when scraping completes or errors occur</span>
+        </label>
+        <input type="checkbox" id="enable-notifications" class="switch-input" checked onchange="saveAppSettings()">
+        <span class="switch-toggle"></span>
+      </div>
+    </div>
+  `;
+}
+function getAppearanceHTML() {
+  return `
+    <div class="settings-page-header">
+      <h2>Appearance</h2>
+    </div>
+    <div class="settings-section">
+      <h3>Theme</h3>
+      <div class="theme-selector">
+        <button class="theme-option active" onclick="selectTheme('dark', this)">
+          <div class="theme-preview dark"></div>
+          <span>Dark</span>
+        </button>
+        <button class="theme-option" onclick="selectTheme('light', this)">
+          <div class="theme-preview light"></div>
+          <span>Light</span>
+        </button>
+        <button class="theme-option" onclick="selectTheme('auto', this)">
+          <div class="theme-preview auto"></div>
+          <span>Auto</span>
+        </button>
+      </div>
+    </div>
+    <div class="settings-section">
+      <h3>Font Size</h3>
+      <div class="font-size-control">
+        <span class="size-label">10px</span>
+        <input type="range" id="font-size" min="10" max="20" value="14" 
+               class="size-slider" oninput="updateFontSize(this.value)">
+        <span class="size-label">20px</span>
+        <span class="size-value" id="font-size-value">14px</span>
+      </div>
+      <div class="font-preview">
+        <span>Preview: The quick brown fox jumps over the lazy dog</span>
+      </div>
+    </div>
+  `;
+}
+function getScrapingSettingsHTML() {
+  return `
+    <div class="settings-page-header">
+      <h2>Scraping Settings</h2>
+    </div>
+    <div class="settings-section">
+      <h3>Performance</h3>
+      <div class="settings-field">
+        <label>Default Keyword Batch Size</label>
+        <select class="field-select">
+          <option value="5">5 posts</option>
+          <option value="10" selected>10 posts</option>
+          <option value="25">25 posts</option>
+          <option value="50">50 posts</option>
+        </select>
+      </div>
+      <div class="settings-field">
+        <label>Default DeepScan Batch Size</label>
+        <select class="field-select">
+          <option value="10">10 posts</option>
+          <option value="25" selected>25 posts</option>
+          <option value="50">50 posts</option>
+          <option value="100">100 posts</option>
+        </select>
+      </div>
+    </div>
+  `;
+}
+function getUpdatesHTML() {
+  return `
+    <div class="settings-page-header">
+      <h2>Updates</h2>
+    </div>
+    <div class="settings-section">
+      <h3>Version Information</h3>
+      <div class="settings-field">
+        <label>Current Version</label>
+        <div class="field-value">${appData.nlpAvailable ? '2.0.0e' : '2.0.0s'}</div>
+      </div>
+      <div class="settings-field">
+        <label>Latest Version</label>
+        <div class="field-value" id="latest-version">Checking...</div>
+      </div>
+      <button class="button-primary" onclick="checkForUpdates()">
+        Check for Updates
+      </button>
+      <div id="update-message" class="update-notice" style="display: none;"></div>
+    </div>
+  `;
+}
+function getAdvancedSettingsHTML() {
+  return `
+    <div class="settings-page-header">
+      <h2>Advanced</h2>
+    </div>
+    <div class="settings-section">
+      <h3>Maintenance</h3>
+      <button class="button-secondary" onclick="openErrorLog()">
+        🐛 View Error Log
+      </button>
+      <button class="button-warning" onclick="resetToDefaults()">
+        ⚠️ Reset to Defaults
+      </button>
+    </div>
+    <div class="settings-section danger-zone">
+      <h3>Danger Zone</h3>
+      <div class="settings-switch">
+        <label>
+          <span>Delete all user data on uninstall</span>
+          <span class="switch-description">Remove all saved credentials and preferences</span>
+        </label>
+        <input type="checkbox" id="delete-all-data" class="switch-input">
+        <span class="switch-toggle danger"></span>
+      </div>
+      <button class="button-danger" onclick="showUninstallDialog()">
+        Uninstall SupaScrapeR
+      </button>
+    </div>
+  `;
+}
+function getLogoutHTML() {
+  return `
+    <div class="settings-page-header">
+      <h2>Log Out</h2>
+    </div>
+    <div class="settings-section">
+      <p>Are you sure you want to log out? This will clear your saved credentials.</p>
+      <button class="button-danger" onclick="handleLogout()">
+        Log Out
+      </button>
+      <button class="button-secondary" onclick="switchSettingsTab('account')">
+        Cancel
+      </button>
+    </div>
+  `;
+}
+window.closeSettings = () => {
+  loadScreen('home');
+};
+window.selectTheme = (theme, button) => {
+  document.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('active'));
+  button.classList.add('active');
+  changeTheme(theme);
+};
+window.checkForUpdates = (silent = false) => {
+  const versionElement = document.getElementById('latest-version');
+  const messageElement = document.getElementById('update-message');
+  if (versionElement) {
+    versionElement.innerHTML = '<span style="color: var(--text-tertiary);">Checking...</span>';
+  }
+  fetch('https://api.github.com/repos/kennethkhuang/supascraper/releases/latest')
+    .then(response => response.json())
+    .then(data => {
+      const latestVersion = data.tag_name?.replace('v', '') || 'Unknown';
+      if (versionElement) {
+        versionElement.innerHTML = latestVersion;
+      }
+      const currentVersion = appData.nlpAvailable ? '2.0.0e' : '2.0.0s';
+      if (latestVersion !== currentVersion && latestVersion !== 'Unknown' && !silent) {
+        if (messageElement) {
+          messageElement.style.display = 'block';
+          messageElement.innerHTML = `
+            <span style="color: var(--success);">✅ Update available!</span>
+            <a href="${data.html_url}" target="_blank" style="color: var(--accent-primary); text-decoration: none; margin-left: 10px;">
+              Download ${latestVersion}
+            </a>
+          `;
+        }
+      } else if (!silent && messageElement) {
+        messageElement.style.display = 'block';
+        messageElement.innerHTML = '<span style="color: var(--text-secondary);">You are using the latest version</span>';
+        setTimeout(() => {
+          messageElement.style.display = 'none';
+        }, 3000);
+      }
+    })
+    .catch(err => {
+      if (versionElement) {
+        versionElement.innerHTML = '<span style="color: var(--error);">Check failed</span>';
+      }
+    });
+};
+window.openErrorLog = () => {
+  const errorLogPath = path.join(appData.dataFolder || getDefaultFolder(), 'error_log.txt');
+  if (!fs.existsSync(errorLogPath)) {
+    fs.writeFileSync(errorLogPath, `SupaScrapeR Error Log\nCreated: ${new Date().toISOString()}\n\n`);
+  }
+  if (process.platform === 'win32') {
+    require('child_process').exec(`notepad "${errorLogPath}"`);
+  } else if (process.platform === 'darwin') {
+    require('child_process').exec(`open "${errorLogPath}"`);
+  } else {
+    require('child_process').exec(`xdg-open "${errorLogPath}"`);
+  }
+};
+window.resetToDefaults = () => {
+  if (confirm('Are you sure you want to reset all settings to defaults?\n\nThis will:\n• Reset all preferences\n• Clear saved batch sizes\n• Reset theme to dark mode')) {
+    localStorage.removeItem('supascraper-app-settings');
+    localStorage.removeItem('supascraper-batch-settings');
+    document.body.setAttribute('data-theme', 'dark');
+    document.documentElement.style.setProperty('--base-font-size', '14px');
+    switchSettingsTab('account');
+    loadAppSettings();
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'reset-notification';
+    messageDiv.textContent = '✅ Settings reset to defaults';
+    messageDiv.style.cssText = `
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--success);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      z-index: 9999;
+      animation: slideUp 0.3s ease;
+    `;
+    document.body.appendChild(messageDiv);
+    setTimeout(() => messageDiv.remove(), 3000);
+  }
+};
+window.showUninstallDialog = () => {
+  const deleteData = document.getElementById('delete-all-data')?.checked;
+  const message = deleteData 
+    ? 'This will uninstall SupaScrapeR and DELETE all your data!\n\nAre you sure?'
+    : 'This will uninstall SupaScrapeR.\n\nYour data will be preserved.\n\nAre you sure?';
+  if (confirm(message)) {
+    if (deleteData) {
+      const dataFolder = appData.dataFolder || getDefaultFolder();
+      if (fs.existsSync(dataFolder)) {
+        fs.rmSync(dataFolder, { recursive: true, force: true });
+      }
+    }
+    ipcRenderer.send('uninstall-app', { deleteData });
+  }
+};
+window.changeTheme = (theme) => {
+  document.body.setAttribute('data-theme', theme);
+  saveAppSettings();
+};
+window.updateFontSize = (size) => {
+  document.documentElement.style.setProperty('--base-font-size', `${size}px`);
+  const sizeValue = document.getElementById('font-size-value');
+  if (sizeValue) sizeValue.textContent = `${size}px`;
+  saveAppSettings();
+};
+window.selectTheme = (theme, button) => {
+  document.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('active'));
+  button.classList.add('active');
+  changeTheme(theme);
 };
 function loadScrapeModeScreen() {
   const container = document.getElementById('screen-container');
@@ -1556,7 +2208,7 @@ window.stopScraping = () => {
   document.getElementById('screen-container').style.maxWidth = '';
   }
 };
-function loadSettingsScreen() {
+function loadSubredditConfigScreen() {
   const type = appData.currentSettingsType;
   const container = document.getElementById('screen-container');
   const isBoth = type === 'both';
