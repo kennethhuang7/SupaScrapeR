@@ -111,6 +111,28 @@ export default function SettingsPage() {
   useEffect(() => {
     loadDataPaths()
   }, [])
+  useEffect(() => {
+    const handleUpdateStatus = (event: any, data: any) => {
+      switch (data.type) {
+        case 'checking':
+          toast.info('Checking for updates...')
+          break
+        case 'not-available':
+          toast.success('You are running the latest version')
+          break
+        case 'available':
+          toast.info(`Update available: v${data.version}`)
+          break
+        case 'error':
+          toast.error('Unable to check for updates')
+          break
+      }
+    }
+
+    if (window.electronAPI?.onUpdateStatus) {
+      window.electronAPI.onUpdateStatus(handleUpdateStatus)
+    }
+  }, [])
 
   const loadDataPaths = async () => {
     try {
@@ -554,7 +576,12 @@ export default function SettingsPage() {
     }
   }
   const checkForUpdates = async () => {
-    await UpdateChecker.checkForUpdates(false)
+    try {
+      await window.electronAPI?.checkForUpdates()
+    } catch (error) {
+      console.error('Update check error:', error)
+      toast.error('Failed to check for updates')
+    }
   }
   const resetToDefaults = () => {
     setSettings({
