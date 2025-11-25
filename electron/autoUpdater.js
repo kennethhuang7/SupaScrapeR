@@ -1,8 +1,11 @@
-import { autoUpdater } from 'electron-updater'
+import pkg from 'electron-updater'
+const { autoUpdater } = pkg
 import { errorLogger } from './services/errorLogger.js'
+
 autoUpdater.autoDownload = false
 autoUpdater.autoInstallOnAppQuit = true
 let updateCheckInProgress = false
+
 export function setupAutoUpdater(mainWindow) {
 	autoUpdater.on('checking-for-update', () => {
 		if (mainWindow && mainWindow.webContents) {
