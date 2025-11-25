@@ -112,10 +112,9 @@ export default function SettingsPage() {
     loadDataPaths()
   }, [])
   useEffect(() => {
-    const handleUpdateStatus = (event: any, data: any) => {
+    const handleUpdateStatus = (_event: any, data: any) => {
       switch (data.type) {
         case 'checking':
-          toast.info('Checking for updates...')
           break
         case 'not-available':
           toast.success('You are running the latest version')
@@ -576,10 +575,17 @@ export default function SettingsPage() {
     }
   }
   const checkForUpdates = async () => {
+    const toastId = toast.loading('Checking for updates...')
+    
     try {
       await window.electronAPI?.checkForUpdates()
+      
+      setTimeout(() => {
+        toast.dismiss(toastId)
+      }, 5000)
     } catch (error) {
       console.error('Update check error:', error)
+      toast.dismiss(toastId)
       toast.error('Failed to check for updates')
     }
   }
