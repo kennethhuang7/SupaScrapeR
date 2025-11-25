@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/supascraper-icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SupaScrapeR</title>
+    <script>
+      (async function() {
+        try {
+          const settings = await window.electronAPI?.getSettings()
+          if (settings?.interface?.fontSize) {
+            document.documentElement.style.fontSize = `${settings.interface.fontSize}px`
+            document.documentElement.style.setProperty('--toast-scale', (settings.interface.fontSize / 16).toString())
+          }
+        } catch (error) {
+          console.error('Failed to preload font size:', error)
+        }
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

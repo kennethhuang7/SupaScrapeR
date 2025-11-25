@@ -1,0 +1,164 @@
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="UTF-8">
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html, body {
+        width: 100%;
+        height: 100%;
+        background: transparent;
+        overflow: hidden;
+      }
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+      .splash-container {
+        width: 320px;
+        height: 320px;
+        background: #0a0e1a;
+        border-radius: 24px;
+        box-shadow: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 32px 32px 32px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .logo-wrapper {
+        position: relative;
+        width: 100%;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .logo-container {
+        position: relative;
+        width: 240px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+      }
+      .logo-image {
+        width: 190px;
+        height: 70px;
+        object-fit: contain;
+        margin-left: 55px;
+        clip-path: inset(0 0 0 100%);
+        animation: revealLogo 1.4s ease-out 0.05s forwards;
+      }
+      .scraper-graphic {
+        position: absolute;
+        right: -50px;
+        top: 50%;
+        transform: translateY(calc(-50% - 2px));
+        display: flex;
+        align-items: center;
+        gap: -1px;
+        margin-top: 2px;
+        animation: scrapeRightToLeft 1.4s ease-out forwards;
+      }
+      .scraper-blade {
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        border-radius: 0 50% 50% 0;
+        z-index: 2;
+      }
+      .scraper-handle {
+        width: 18px;
+        height: 14px;
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        border-radius: 0 6px 6px 0;
+        margin-left: -2px;
+        z-index: 1;
+      }
+      @keyframes scrapeRightToLeft {
+        to {
+          right: calc(100% - 50px);
+        }
+      }
+      @keyframes revealLogo {
+        from {
+          clip-path: inset(0 0 0 100%);
+        }
+        to {
+          clip-path: inset(0 0 0 0);
+        }
+      }
+      .loading-container {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+      }
+      .dots-container {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+      }
+      .dot {
+        width: 9px;
+        height: 9px;
+        background: #60a5fa;
+        border-radius: 50%;
+        animation: pulse 1.4s ease-in-out infinite;
+      }
+      .dot:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .dot:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+      @keyframes pulse {
+        0%, 100% {
+          opacity: 0.3;
+          transform: scale(0.8);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      .loading-text {
+        text-align: center;
+        font-size: 10px;
+        color: rgba(148, 163, 184, 0.65);
+        text-transform: uppercase;
+        letter-spacing: 2.5px;
+        font-weight: 500;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="splash-container">
+      <div class="logo-wrapper">
+        <div class="logo-container">
+          <img src="../assets/supascraper-text-only.png" alt="SupaScrapeR" class="logo-image">
+          <div class="scraper-graphic">
+            <div class="scraper-blade"></div>
+            <div class="scraper-handle"></div>
+          </div>
+        </div>
+      </div>
+      <div class="loading-container">
+        <div class="dots-container">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+        <p class="loading-text">LOADING</p>
+      </div>
+    </div>
+  </body>
+  </html>
