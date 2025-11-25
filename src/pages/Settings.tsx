@@ -1531,14 +1531,32 @@ export default function SettingsPage() {
               <div className="bg-card border border-border rounded-lg p-6">
                 <h3 className="font-semibold mb-3">Resources</h3>
                 <div className="space-y-2">
-                  <a href="#" className="block p-3 bg-secondary/30 hover:bg-secondary/50 rounded-lg transition-all">
-                    Documentation
+                  <a 
+                    href="https://github.com/kennethhuang7/SupaScrapeR#readme" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="block p-3 bg-secondary/30 hover:bg-secondary/50 rounded-lg transition-all flex items-center justify-between group"
+                  >
+                    <span>Documentation</span>
+                    <ExternalLink size={16} className="text-muted-foreground group-hover:text-foreground transition-colors" />
                   </a>
-                  <a href="#" className="block p-3 bg-secondary/30 hover:bg-secondary/50 rounded-lg transition-all">
-                    GitHub Repository
+                  <a 
+                    href="https://github.com/kennethhuang7/SupaScrapeR" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="block p-3 bg-secondary/30 hover:bg-secondary/50 rounded-lg transition-all flex items-center justify-between group"
+                  >
+                    <span>GitHub Repository</span>
+                    <ExternalLink size={16} className="text-muted-foreground group-hover:text-foreground transition-colors" />
                   </a>
-                  <a href="#" className="block p-3 bg-secondary/30 hover:bg-secondary/50 rounded-lg transition-all">
-                    Report an Issue
+                  <a 
+                    href="https://github.com/kennethhuang7/SupaScrapeR/issues" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="block p-3 bg-secondary/30 hover:bg-secondary/50 rounded-lg transition-all flex items-center justify-between group"
+                  >
+                    <span>Report an Issue</span>
+                    <ExternalLink size={16} className="text-muted-foreground group-hover:text-foreground transition-colors" />
                   </a>
                 </div>
               </div>
