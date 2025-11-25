@@ -80,7 +80,7 @@
     "publish": {
       "provider": "github",
       "owner": "kennethhuang7",
-      "repo": "SupaScrapeR-BETA"
+      "repo": "SupaScrapeR"
     },
     "directories": {
       "output": "dist-electron",
