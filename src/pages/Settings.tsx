@@ -112,24 +112,36 @@ export default function SettingsPage() {
     loadDataPaths()
   }, [])
   useEffect(() => {
+    let unsubscribe: (() => void) | undefined
+
     const handleUpdateStatus = (_event: any, data: any) => {
+      console.log('Update status received:', data)
       switch (data.type) {
         case 'checking':
           break
         case 'not-available':
+          toast.dismiss()
           toast.success('You are running the latest version')
           break
         case 'available':
+          toast.dismiss()
           toast.info(`Update available: v${data.version}`)
           break
         case 'error':
+          toast.dismiss()
           toast.error('Unable to check for updates')
           break
       }
     }
 
     if (window.electronAPI?.onUpdateStatus) {
-      window.electronAPI.onUpdateStatus(handleUpdateStatus)
+      unsubscribe = window.electronAPI.onUpdateStatus(handleUpdateStatus)
+    }
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe()
+      }
     }
   }, [])
 
@@ -575,17 +587,13 @@ export default function SettingsPage() {
     }
   }
   const checkForUpdates = async () => {
-    const toastId = toast.loading('Checking for updates...')
+    toast.loading('Checking for updates...')
     
     try {
       await window.electronAPI?.checkForUpdates()
-      
-      setTimeout(() => {
-        toast.dismiss(toastId)
-      }, 5000)
     } catch (error) {
       console.error('Update check error:', error)
-      toast.dismiss(toastId)
+      toast.dismiss()
       toast.error('Failed to check for updates')
     }
   }
@@ -1520,7 +1528,7 @@ export default function SettingsPage() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between p-4 bg-secondary/30 rounded-lg">
                     <span className="font-medium">Version</span>
-                    <span className="text-muted-foreground">v2.0.2</span>
+                    <span className="text-muted-foreground">v2.0.3</span>
                   </div>
                   <div className="flex items-center justify-between p-4 bg-secondary/30 rounded-lg">
                     <span className="font-medium">Build Type</span>
