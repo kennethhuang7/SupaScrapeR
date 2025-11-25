@@ -1,5 +1,5 @@
 export class UpdateChecker {
-  private static currentVersion = '2.0.0'
+  private static currentVersion = '2.0.1'
   private static isChecking = false
   static async checkForUpdates(silent: boolean = false): Promise<boolean> {
     if (this.isChecking) return false
