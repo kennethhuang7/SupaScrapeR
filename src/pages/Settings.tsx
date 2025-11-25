@@ -587,13 +587,17 @@ export default function SettingsPage() {
     }
   }
   const checkForUpdates = async () => {
-    toast.loading('Checking for updates...')
+    const loadingToast = toast.loading('Checking for updates...')
     
     try {
       await window.electronAPI?.checkForUpdates()
+      
+      setTimeout(() => {
+        toast.dismiss(loadingToast)
+      }, 3000)
     } catch (error) {
       console.error('Update check error:', error)
-      toast.dismiss()
+      toast.dismiss(loadingToast)
       toast.error('Failed to check for updates')
     }
   }
@@ -1528,7 +1532,7 @@ export default function SettingsPage() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between p-4 bg-secondary/30 rounded-lg">
                     <span className="font-medium">Version</span>
-                    <span className="text-muted-foreground">v2.0.3</span>
+                    <span className="text-muted-foreground">v2.0.4</span>
                   </div>
                   <div className="flex items-center justify-between p-4 bg-secondary/30 rounded-lg">
                     <span className="font-medium">Build Type</span>

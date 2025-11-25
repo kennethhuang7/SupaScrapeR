@@ -5,6 +5,7 @@ import { errorLogger } from './services/errorLogger.js'
 autoUpdater.autoDownload = false
 autoUpdater.autoInstallOnAppQuit = true
 let updateCheckInProgress = false
+autoUpdater.logger = errorLogger
 
 export function setupAutoUpdater(mainWindow) {
 	autoUpdater.on('checking-for-update', () => {
@@ -64,7 +65,13 @@ export async function checkForUpdates(silent = false) {
 	if (updateCheckInProgress) return
 	updateCheckInProgress = true
 	try {
-		const result = await autoUpdater.checkForUpdates()
+		const timeoutPromise = new Promise((_, reject) => {
+			setTimeout(() => reject(new Error('Update check timed out')), 10000)
+		})
+		const result = await Promise.race([
+			autoUpdater.checkForUpdates(),
+			timeoutPromise
+		])
 		return result
 	} catch (error) {
 		errorLogger.error('Update check failed', error)
