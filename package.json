@@ -1,7 +1,7 @@
 {
   "name": "supascraper",
   "private": true,
-  "version": "2.0.4",
+  "version": "2.0.5",
   "type": "module",
   "main": "electron/main.js",
   "description": "Reddit data collection and analysis tool",

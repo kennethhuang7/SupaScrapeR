@@ -1505,7 +1505,7 @@ export default function SettingsPage() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between p-4 bg-secondary/30 rounded-lg">
                     <span className="font-medium">Version</span>
-                    <span className="text-muted-foreground">v2.0.4</span>
+                    <span className="text-muted-foreground">v2.0.5</span>
                   </div>
                   <div className="flex items-center justify-between p-4 bg-secondary/30 rounded-lg">
                     <span className="font-medium">Build Type</span>
