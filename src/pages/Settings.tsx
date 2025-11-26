@@ -184,25 +184,9 @@ export default function SettingsPage() {
     let supabaseKey = ''
     let redditCreds = null
     if (user?.personal_supabase_url && user?.personal_supabase_key) {
-      const encryptionEnabled = user?.preferences?.security?.encryptCredentials === true
-      if (encryptionEnabled) {
-        try {
-          const testUrl = await EncryptionService.decrypt(user.personal_supabase_url, user.id)
-          if (testUrl && testUrl.startsWith('http')) {
-            supabaseUrl = testUrl
-            supabaseKey = await EncryptionService.decrypt(user.personal_supabase_key, user.id)
-          } else {
-            supabaseUrl = user.personal_supabase_url
-            supabaseKey = user.personal_supabase_key
-          }
-        } catch {
-          supabaseUrl = user.personal_supabase_url
-          supabaseKey = user.personal_supabase_key
-        }
-      } else {
-        supabaseUrl = user.personal_supabase_url
-        supabaseKey = user.personal_supabase_key
-      }
+      supabaseUrl = user.personal_supabase_url
+      supabaseKey = user.personal_supabase_key
+      
       localStorage.setItem('supabase_credentials', JSON.stringify({
         url: supabaseUrl,
         key: supabaseKey
@@ -216,20 +200,9 @@ export default function SettingsPage() {
         console.error('Failed to parse stored Supabase credentials:', e)
       }
     }
+
     if (user?.reddit_credentials) {
-      const encryptionEnabled = user?.preferences?.security?.encryptCredentials === true
-      if (encryptionEnabled) {
-        try {
-          redditCreds = await EncryptionService.decryptCredentials(user.reddit_credentials, user.id, true)
-          if (!redditCreds?.clientId || redditCreds.clientId.length < 10) {
-            redditCreds = user.reddit_credentials
-          }
-        } catch {
-          redditCreds = user.reddit_credentials
-        }
-      } else {
-        redditCreds = user.reddit_credentials
-      }
+      redditCreds = user.reddit_credentials
     }
     let initialFontSize = 12
     if (user?.preferences?.interface?.fontSize) {
@@ -1536,7 +1509,7 @@ export default function SettingsPage() {
                   </div>
                   <div className="flex items-center justify-between p-4 bg-secondary/30 rounded-lg">
                     <span className="font-medium">Build Type</span>
-                    <span className="text-muted-foreground">Production</span>
+                    <span className="text-muted-foreground">Release</span>
                   </div>
                   <label className="flex items-center justify-between p-4 bg-secondary/30 rounded-lg cursor-pointer hover:bg-secondary/40 transition-all">
                     <div>

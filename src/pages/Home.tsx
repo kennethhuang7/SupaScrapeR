@@ -624,7 +624,7 @@ export default function HomePage() {
             <p className="text-sm font-medium">Check Updates</p>
           </button>
           <button
-            onClick={() => window.open('https://www.twitch.tv/nickich', '_blank')}
+            onClick={() => window.open('https://github.com/kennethhuang7/SupaScrapeR#readme', '_blank')}
             className="bg-secondary/30 hover:bg-secondary/50 rounded-xl p-6 hover:scale-105 transition-all group border border-border/30"
           >
             <HelpCircle className="mx-auto mb-2 group-hover:scale-110 transition-transform" size={24} />
