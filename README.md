@@ -60,6 +60,11 @@ A modern, cross-platform desktop application for intelligent Reddit data scrapin
 
 SupaScrapeR is a professional-grade Reddit data collection tool built with Electron and React. It provides researchers, analysts, and developers with powerful tools to gather, analyze, and store Reddit data at scale through an intuitive graphical interface.
 
+<p align="center">
+  <img src="assets/demo/dashboard.png" alt="SupaScrapeR Dashboard" width="800">
+</p>
+<p align="center"><em>Centralized dashboard with real-time metrics and scraping controls</em></p>
+
 **Use Cases:**
 - Market research and competitive analysis
 - Social sentiment tracking and brand monitoring
@@ -114,6 +119,11 @@ SupaScrapeR is a professional-grade Reddit data collection tool built with Elect
 - Emotion detection and classification
 - Custom sentiment threshold configuration
 
+<p align="center">
+  <img src="assets/demo/statistics.png" alt="Analytics Dashboard" width="800">
+</p>
+<p align="center"><em>Comprehensive analytics with collection trends and performance metrics</em></p>
+
 **Real-Time Monitoring**
 - Live collection statistics and progress metrics
 - System resource usage monitoring (CPU, RAM)
@@ -139,6 +149,11 @@ SupaScrapeR is a professional-grade Reddit data collection tool built with Elect
 - Download community-created configurations
 - Rate and report presets
 - Preset versioning and updates
+
+<p align="center">
+  <img src="assets/demo/community-presets.png" alt="Community Presets" width="800">
+</p>
+<p align="center"><em>Browse and download presets shared by the community</em></p>
 
 ### Security & Privacy
 
@@ -234,13 +249,13 @@ xattr -dr com.apple.quarantine "/Applications/SupaScrapeR.app"
 **Installation Steps:**
 1. Download `SupaScrapeR-x.x.x.AppImage`
 2. Make it executable:
-   ```bash
+```bash
    chmod +x SupaScrapeR-x.x.x.AppImage
-   ```
+```
 3. Run the application:
-   ```bash
+```bash
    ./SupaScrapeR-x.x.x.AppImage
-   ```
+```
 
 ---
 
@@ -258,7 +273,6 @@ xattr -dr com.apple.quarantine "/Applications/SupaScrapeR.app"
 **Important:** Python 3.10 is specifically required. Newer versions (3.11+) may have compatibility issues with spaCy 3.7.2.
 
 #### Clone and Install
-
 ```bash
 # Clone the repository
 git clone https://github.com/kennethhuang7/SupaScrapeR.git
@@ -440,6 +454,11 @@ You'll need to provide:
 - Client Secret: 27-character string from Reddit app
 - User Agent: Your custom user agent string
 
+<p align="center">
+  <img src="assets/demo/settings-credentials.png" alt="Configuration Settings" width="800">
+</p>
+<p align="center"><em>Enter your API credentials in the settings panel</em></p>
+
 **Step 3: Verify Configuration**
 
 The app will test your credentials and ensure connectivity to both services.
@@ -509,6 +528,11 @@ Presets allow you to save and share subreddit configurations.
    - Visibility (private or community)
 4. Save preset
 
+<p align="center">
+  <img src="assets/demo/create-preset.png" alt="Create New Preset" width="800">
+</p>
+<p align="center"><em>Create and configure custom scraping presets</em></p>
+
 #### Using Community Presets
 
 1. Navigate to Community page
@@ -542,6 +566,11 @@ The scraping interface provides real-time feedback:
 - CPU and RAM usage
 - Network activity
 
+<p align="center">
+  <img src="assets/demo/scraping-progress.png" alt="Scraping Progress Monitor" width="800">
+</p>
+<p align="center"><em>Real-time progress tracking with detailed logs and system metrics</em></p>
+
 **Live Logging:**
 - Real-time activity feed
 - Error messages with details
@@ -554,6 +583,11 @@ The scraping interface provides real-time feedback:
 - Export current session data
 - View collected posts
 
+<p align="center">
+  <img src="assets/demo/posts-view.png" alt="Collected Posts" width="800">
+</p>
+<p align="center"><em>Browse and analyze your collected Reddit posts</em></p>
+
 ---
 
 ## Architecture
@@ -561,7 +595,6 @@ The scraping interface provides real-time feedback:
 ### System Overview
 
 SupaScrapeR uses a hybrid architecture combining Electron's main/renderer process separation with a Python backend for Reddit API interaction.
-
 ```
 ┌─────────────────────────────────────────────────┐
 │                  Electron Main                  │
@@ -656,7 +689,6 @@ npm run dist
 ```
 
 ### Project Structure
-
 ```
 SupaScrapeR/
 ├── electron/                 # Electron main process
@@ -745,25 +777,25 @@ We welcome contributions! Here's how you can help:
 **For maintainers publishing new versions:**
 
 1. **Update Version:**
-   ```bash
+```bash
    # Update version in package.json
    # Example: "2.0.0" → "2.0.1" (bug fix)
    #          "2.0.0" → "2.1.0" (new feature)
    #          "2.0.0" → "3.0.0" (breaking change)
-   ```
+```
 
 2. **Build Installer:**
-   ```bash
+```bash
    npm run dist
-   ```
+```
 
 3. **Commit and Tag:**
-   ```bash
+```bash
    git add .
    git commit -m "Release v2.0.1"
    git tag v2.0.1
    git push origin main --tags
-   ```
+```
 
 4. **Create GitHub Release:**
    - Go to GitHub Releases page
