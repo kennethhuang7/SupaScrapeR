@@ -454,11 +454,6 @@ You'll need to provide:
 - Client Secret: 27-character string from Reddit app
 - User Agent: Your custom user agent string
 
-<p align="center">
-  <img src="assets/demo/settings-credentials.png" alt="Configuration Settings" width="800">
-</p>
-<p align="center"><em>Enter your API credentials in the settings panel</em></p>
-
 **Step 3: Verify Configuration**
 
 The app will test your credentials and ensure connectivity to both services.
