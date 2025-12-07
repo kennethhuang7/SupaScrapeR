@@ -56,3 +56,7 @@ __pycache__/
 
 # Misc
 .vscode/settings.json
+
+#venv
+venv_standard/
+venv_enhanced/
